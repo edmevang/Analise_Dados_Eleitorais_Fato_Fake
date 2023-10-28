@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 ### 1 - Importação de Dados de Bens de Candidatos para o ano eleitoral 2022
 
 ``` py3
-arquivoBensCandidatos = 'C:\\Temp\\Eleitoral\\BensCandidatos\\bem_candidato_2022_BRASIL.csv'
+arquivoBensCandidatos = '../Dados/bem_candidato_2022_BRASIL.csv'
 
 dfBens = pd.read_csv( arquivoBensCandidatos
                      , sep=';'
@@ -33,14 +33,13 @@ dfBens['VR_BEM_CANDIDATO'] = dfBens['VR_BEM_CANDIDATO'].str.replace(',', '.').as
 ### 2 - Importação de Dados de Candidatos para os anos eleitorais de 2014 à 2022
 
 ``` py3
-diretorioCandidatos = 'C:\\Temp\\Eleitoral\\Candidatos\\'
+pasta = '../Dados/'
+arquivos = [arq for arq in os.listdir(pasta) if arq.startswith('consulta') and arq.endswith('.csv') and os.path.isfile(os.path.join(pasta, arq))]
 
 dfCandidatos = pd.DataFrame()
 
-for arquivos in os.listdir(diretorioCandidatos):
-
-    arquivoCandidatos = diretorioCandidatos + arquivos 
-    
+for arquivo in arquivos:
+    arquivoCandidatos = pasta + arquivo
     df = pd.read_csv(arquivoCandidatos
                                , sep=';'
                                , engine='python'
@@ -62,7 +61,7 @@ for arquivos in os.listdir(diretorioCandidatos):
     dfCandidatos = pd.concat([dfCandidatos , df] , ignore_index=True )
 ```
 
-### 3 - Consolidação dos Bens declarados por Candidato e listagem dos 10 mais ricos
+### 3 - Consolidação dos Bens declarados por Candidato e Listagem dos 10 mais ricos
 
 ``` py3
 resultBensAgregado = dfBens.groupby(['SQ_CANDIDATO'],as_index=False) \
@@ -98,7 +97,7 @@ dfCandidatos.loc[dfCandidatos['DS_COR_RACA'].isin(['INDÍGENA']), 'DS_COR_RACA_T
 dfCandidatos.loc[dfCandidatos['DS_COR_RACA'].isin(['NÃO DIVULGÁVEL','NÃO INFORMADO']), 
                  'DS_COR_RACA_TRATADA'] = 'COR_NAO_DIVULGAVEL'
 
-dfCanidatoCorRaca = dfCandidatos.groupby(['ANO_ELEICAO'
+dfCandidatoCorRaca = dfCandidatos.groupby(['ANO_ELEICAO'
                                           ,'DS_COR_RACA_TRATADA'],as_index=False).agg(QTD_CANDIDATO=('SQ_CANDIDATO','count'))
 
 dfCandidatos.loc[dfCandidatos['DS_COR_RACA'].isin(['NÃO DIVULGÁVEL'
@@ -108,11 +107,11 @@ dfCandidatos.loc[dfCandidatos['DS_COR_RACA'].isin(['NÃO DIVULGÁVEL'
                                                    ,'PARDA'
                                                    ,'PRETA']), 'DS_COR_RACA_TRATADA'] = 'TOTAL'
 
-dfCanidatoCorRacaoTotal = dfCanidatoCorRaca.groupby(['ANO_ELEICAO'],as_index=False) \
+dfCandidatoCorRacaoTotal = dfCandidatoCorRaca.groupby(['ANO_ELEICAO'],as_index=False) \
                                                 .agg(QTD_CANDIDATO_TOTAL=('QTD_CANDIDATO','sum'))
 
-resultCandidatoCorRaca = pd.merge(left=dfCanidatoCorRaca
-, right=dfCanidatoCorRacaoTotal
+resultCandidatoCorRaca = pd.merge(left=dfCandidatoCorRaca
+, right=dfCandidatoCorRacaoTotal
 , left_on='ANO_ELEICAO'
 , right_on='ANO_ELEICAO'
 )
@@ -241,7 +240,7 @@ ax.set_frame_on(False)
 ax.set_title('Percentual Candidatos Governador Nascidos No Estado',loc='center',pad=30,fontdict={'fontsize':20},color='#3f3f4e')
 #retirando o eixo y
 ax.get_yaxis().set_visible(False)
-#retirnado os ticks do eixo x
+#retirado os ticks do eixo x
 ax.tick_params(axis='x',length=0,labelsize=12,colors='black')
 #ajustando o título do gráfico
 ax.set_xlabel('Candidatos Governador Nascidos No Estado',labelpad=10,fontdict={'fontsize':10},color='black')
@@ -256,7 +255,7 @@ for retangulo in ax.patches:
 plt.tight_layout();
 ```
 
-### 7 - Análise de Candidatos que Declararam e Não Declararam Patrimônios
+### 7 - Análise de Candidatos que Declararam e Não Declararam Patrimônio
 
 ``` py3
 resultFinalBensCandidatosDeclarado = pd.merge(left=dfCandidatos
@@ -297,7 +296,7 @@ resultFinalBensCandidatosDeclaradoAgregado = resultFinalBensCandidatosDeclarado.
                                     ,as_index=False).agg(QTD_CANDIDATO=('SQ_CANDIDATO','count'),VLR_TOTAL_BENS=('VLR_TOTAL_BEM_C','sum'))
 
 resultFinalBensCandidatosDeclaradoAgregado = pd.merge(left=resultFinalBensCandidatosDeclaradoAgregado
-, right=dfCanidatoCorRacaoTotal
+, right=dfCandidatoCorRacaoTotal
 , left_on='ANO_ELEICAO'
 , right_on='ANO_ELEICAO'
 )[['ANO_ELEICAO','COMPARACAO','QTD_CANDIDATO','VLR_TOTAL_BENS','QTD_CANDIDATO_TOTAL']]
@@ -307,7 +306,7 @@ resultFinalBensCandidatosDeclaradoAgregado['PERCENTUAL'] = (resultFinalBensCandi
 ```
 
 
-### 7.1 - Gráfico Percentual - Análise de Candidatos que Declararam e Não Declararam Patrimônios
+### 7.1 - Gráfico Percentual - Análise de Candidatos que Declararam e Não Declararam Patrimônio
 
 ``` py3
 #criando a fig e o ax no matplotlib
@@ -336,7 +335,7 @@ plt.tight_layout();
 ```
 
 
-### 7.2 - Gráfico Aberto Por Valor - Análise de Candidatos que Declararam e Não Declararam Patrimônios
+### 7.2 - Gráfico Aberto Por Valor - Análise de Candidatos que Declararam e Não Declararam Patrimônio
 
 ``` py3
 #criando a fig e o ax no matplotlib

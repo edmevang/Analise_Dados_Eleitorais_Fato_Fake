@@ -1,4 +1,4 @@
-site_name: Projeto Fato ou Fake
+site_name: Projeto Fato ou Fake - Eleições 2022
 theme:
   name: material
   palette:
@@ -14,8 +14,9 @@ theme:
         name: Modo claro
 nav:
   - Home: index.md
-  - Regras Negócio: regra_negocio.md
+  - Regras de Negócio: regra_negocio.md
   - Codificação: codigo.md
+  - Créditos: creditos.md
 
 markdown-extensions:
   - pymdownx.tasklist
